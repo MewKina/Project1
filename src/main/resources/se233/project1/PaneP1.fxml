@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="700.0" maxWidth="1000.0" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="CENTER_LEFT" layoutY="-2.0" prefHeight="38.0" prefWidth="1000.0" style="-fx-background-color: white;">
+         <children>
+            <ToggleButton fx:id="edgeBtn" mnemonicParsing="false" text="Edge detector" />
+            <ToggleButton fx:id="cropBtn" mnemonicParsing="false" text="Crop" />
+         </children>
+      </HBox>
+      <VBox layoutY="33.0" prefHeight="667.0" prefWidth="1000.0" style="-fx-background-color: #A8DADC;">
+         <children>
+            <VBox prefHeight="109.0" prefWidth="1000.0" style="-fx-background-color: White; -fx-border-color: #A8DADC; -fx-border-width: 3;">
+               <children>
+                  <Label style="-fx-background-color: #A8DADC;" text="INPUT IMAGE" textFill="WHITE" />
+                  <HBox fx:id="dropFileZone" prefHeight="83.0" prefWidth="955.0" style="-fx-border-style: dashed;">
+                     <children>
+                        <VBox prefHeight="83.0" prefWidth="540.0">
+                           <children>
+                              <Button fx:id="chooseFileBtn" mnemonicParsing="false" text="Choose File" />
+                              <Label fx:id="fileName" alignment="CENTER" prefHeight="52.0" prefWidth="573.0" style="-fx-border-color: #A8DADC; -fx-background-color: #e4f7cd;" text="No file chosen" textFill="#5c7eeb" />
+                           </children>
+                        </VBox>
+                        <Label alignment="CENTER" prefHeight="102.0" prefWidth="456.0" text="Drop an Image here" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <StackPane fx:id="processPane" prefHeight="563.0" prefWidth="1000.0" style="-fx-background-color: White;">
+               <children>
+                  <VBox fx:id="edgeBox" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <VBox fx:id="optionPane" prefHeight="158.0" prefWidth="1000.0">
+                           <children>
+                              <Label style="-fx-background-color: #A8DADC;" text="Option" textFill="WHITE" />
+                              <HBox fx:id="optionEdge" prefHeight="153.0" prefWidth="1000.0">
+                                 <children>
+                                      <ToggleButton fx:id="prewittBtn" style="-fx-background-color: #257574;" text="Prewitt" />
+                                      <ToggleButton fx:id="robertBtn" selected="true" style="-fx-background-color: #257574;" text="Roberts Cross" />
+                                      <ToggleButton fx:id="sobelBtn" style="-fx-background-color: #257574;" text="Sobel" />
+                                 </children>
+                              </HBox>
+                              <VBox fx:id="parameter" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <HBox fx:id="strengthParameter" prefHeight="27.0" prefWidth="1000.0">
+                                       <children>
+                                          <Label alignment="CENTER" prefHeight="34.0" prefWidth="100.0" text="Strength" />
+                                          <Slider fx:id="strengthSlider" prefHeight="72.0" prefWidth="898.0" showTickLabels="true" showTickMarks="true" value="50.0" />
+                                       </children>
+                                    </HBox>
+                                    <HBox fx:id="kernelEdge" prefHeight="41.0" prefWidth="1000.0">
+                                       <children>
+                                          <ToggleButton fx:id="threeBtn" mnemonicParsing="false" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: #257574; -fx-border-color: white;" text="3x3" />
+                                          <ToggleButton fx:id="fiveBtn" mnemonicParsing="false" prefWidth="120.0" style="-fx-background-color: #257574; -fx-border-color: white;" text="5x5" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </VBox>
+                        <HBox prefHeight="448.0" prefWidth="1000.0" style="-fx-border-color: #A8DADC transparent transparent transparent; -fx-border-width: 3 0 0 0;">
+                           <children>
+                              <VBox alignment="TOP_CENTER" prefHeight="433.0" prefWidth="499.0" style="-fx-border-color: transparent  #A8DADC transparent transparent; -fx-border-width: 0 5 0 0;">
+                                 <children>
+                                    <ImageView fx:id="preImageE" fitHeight="313.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
+                                    <HBox prefHeight="29.0" prefWidth="400.0">
+                                       <children>
+                                          <Label text="File name:" />
+                                          <Label fx:id="currentFileNameE" prefHeight="18.0" prefWidth="405.0" text="no file chosen" />
+                                          <Label fx:id="fileNumberE" prefHeight="18.0" prefWidth="27.0" text="0/0" />
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="generateBtnE" mnemonicParsing="false" prefHeight="42.0" prefWidth="112.0" text="Generate" />
+                                    <ProgressBar fx:id="progressBarE" prefHeight="26.0" prefWidth="499.0" progress="0.0" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" prefHeight="420.0" prefWidth="489.0">
+                                 <children>
+                                    <Label prefHeight="27.0" prefWidth="109.0" style="-fx-background-color: #A8DADC;" text="Processed Image" />
+                                    <ImageView fx:id="postImageE" fitHeight="390.0" fitWidth="489.0" pickOnBounds="true" preserveRatio="true" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <HBox fx:id="cropBox" prefHeight="56.0" prefWidth="1000.0" visible="false">
+                     <children>
+                        <VBox alignment="TOP_CENTER" maxHeight="561.0" maxWidth="500.0" prefHeight="561.0" prefWidth="500.0" style="-fx-border-color: transparent  #A8DADC transparent transparent; -fx-border-width: 0 5 0 0;">
+                           <children>
+                              <ImageView fx:id="preImageC" fitHeight="401.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
+                              <HBox prefHeight="27.0" prefWidth="500.0">
+                                 <children>
+                                    <Label text="File name: " />
+                                    <Label fx:id="currentFileC" prefHeight="18.0" prefWidth="404.0" text="no file chosen" />
+                                    <Label fx:id="fileNumberC" text="0/0" />
+                                 </children>
+                              </HBox>
+                              <Button fx:id="generateBtnC" mnemonicParsing="false" prefHeight="41.0" prefWidth="101.0" text="Generate" />
+                              <ProgressBar fx:id="progressBarC" prefHeight="27.0" prefWidth="509.0" progress="0.0" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" maxHeight="561.0" maxWidth="500.0" prefHeight="561.0" prefWidth="500.0">
+                           <children>
+                              <Label alignment="CENTER" prefHeight="25.0" prefWidth="138.0" style="-fx-background-color: #A8DADC;" text="Processed Image" />
+                              <ImageView fx:id="postImageC" fitHeight="529.0" fitWidth="489.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
