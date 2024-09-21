@@ -62,7 +62,7 @@
                                     <HBox fx:id="kernelEdge" prefHeight="41.0" prefWidth="1000.0">
                                        <children>
                                           <ToggleButton fx:id="threeBtn" mnemonicParsing="false" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: #257574; -fx-border-color: white;" text="3x3" />
-                                          <ToggleButton fx:id="fiveBtn" mnemonicParsing="false" prefWidth="120.0" style="-fx-background-color: #257574; -fx-border-color: white;" text="5x5" />
+                                          <ToggleButton fx:id="fiveBtn" mnemonicParsing="false" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: #257574; -fx-border-color: white;" text="5x5" />
                                        </children>
                                     </HBox>
                                  </children>
