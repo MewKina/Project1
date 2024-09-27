@@ -1,4 +1,4 @@
-
+package se233.project1.controller;
 
 public class AllCustomHander{
 
