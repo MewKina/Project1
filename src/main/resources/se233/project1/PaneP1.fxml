@@ -10,125 +10,85 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
 
-<AnchorPane maxHeight="700.0" maxWidth="1000.0" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="700.0" maxWidth="1000.0" prefHeight="700.0" prefWidth="1000.0"
+            xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="se233.project1.controller.AllCustomHandler">
     <children>
         <!-- Top Button Bar -->
-        <HBox alignment="CENTER_LEFT" layoutY="0.0" prefHeight="38.0" prefWidth="1000.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #A8DADC; -fx-border-width: 0 0 3 0;">
+        <HBox alignment="CENTER_LEFT" layoutY="0.0" prefHeight="30.0" prefWidth="1000.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #A8DADC; -fx-border-width: 0 0 3 0;">
             <children>
-                <ToggleButton fx:id="edgeBtn" mnemonicParsing="false" text="Edge detector" styleClass="top-button" />
-                <ToggleButton fx:id="cropBtn" mnemonicParsing="false" text="Crop" styleClass="top-button" />
+                <ToggleButton fx:id="edgeBtn" mnemonicParsing="false" text="Edge detector" onAction="#handleEdgeButtonAction" />
+                <ToggleButton fx:id="cropBtn" mnemonicParsing="false" text="Crop" onAction="#handleCropButtonAction" />
             </children>
         </HBox>
 
-        <!-- Main Content Area -->
-        <VBox layoutY="38.0" prefHeight="662.0" prefWidth="1000.0" style="-fx-background-color: #A8DADC;">
+        <!-- File Selection Area -->
+            <HBox layoutY="40.0" spacing="10.0" alignment="CENTER_LEFT" style="-fx-padding: 10px;">
+                <!-- Drop Zone -->
+                <Label fx:id="dropFileLabel" text="Drop an Image here" alignment="CENTER" prefHeight="50.0" prefWidth="480.0"
+                       style="-fx-background-color: #F1FAEE; -fx-border-color: #457B9D; -fx-border-width: 2; -fx-font-size: 16px;" onDragOver="#handleDragOver" onDragDropped="#handleDrop" />
+                <!-- Choose File Button -->
+                <Button fx:id="chooseFileBtn" text="Choose File" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" onAction="#handleChooseFileAction" />
+                <Label text="Current file: " layoutY="40.0" alignment="CENTER" prefHeight="10" prefWidth="100"/>
+                <Label fx:id="currentFileName" text=" " alignment="CENTER" prefHeight="10" prefWidth="200"/>
+            </HBox>
+
+
+
+        <!-- Edge Detection Options (Slider + Buttons) -->
+        <VBox fx:id="edgeParamsPane" layoutY="110.0" prefHeight="100.0" prefWidth="1000.0" spacing="10.0" visible="true" style="-fx-background-color: #FFFFFF; -fx-padding: 10px;">
+            <Label text="Edge Detection Options" style="-fx-font-size: 14px; -fx-text-fill: #1D3557;" />
+            <HBox spacing="10.0" alignment="CENTER">
+                <!-- Filter Selection -->
+                <Button fx:id="prewittBtn" text="Prewitt" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" />
+                <Button fx:id="robertsCrossBtn" text="Roberts Cross" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" />
+                <Button fx:id="laplacianBtn" text="Laplacian" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" />
+            </HBox>
+            <!-- Slider for Edge Detection Strength -->
+            <HBox alignment="CENTER" spacing="10.0">
+                <!-- Matrix Buttons -->
+                <Button fx:id="matrix3x3" text="3x3" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" />
+                <Button fx:id="matrix5x5" text="5x5" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" />
+                <Label text="Strength" />
+                <Slider fx:id="strengthSlider" prefWidth="700.0" max="100.0" min="0.0" value="50.0" />
+            </HBox>
+        </VBox>
+
+        <!-- Main Content Area (Image Preview + Processed Image) -->
+        <VBox layoutY="220.0" prefHeight="500.0" prefWidth="1000.0" spacing="10.0" style="-fx-background-color: #FFFFFF;">
             <children>
-                <!-- Input Section -->
-                <VBox prefHeight="109.0" prefWidth="1000.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #457B9D; -fx-border-width: 3;">
-                    <children>
-                        <Label text="INPUT IMAGE" style="-fx-background-color: #457B9D; -fx-padding: 10px; -fx-text-fill: #FFFFFF; -fx-font-size: 16px;" />
-                        <HBox fx:id="dropFileZone" prefHeight="83.0" prefWidth="955.0" style="-fx-border-style: dashed; -fx-border-color: #457B9D;">
-                            <children>
-                                <VBox prefHeight="83.0" prefWidth="540.0">
-                                    <children>
-                                        <Button fx:id="chooseFileBtn" mnemonicParsing="false" text="Choose File" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" />
-                                        <Label fx:id="fileName" alignment="CENTER" prefHeight="52.0" prefWidth="573.0" text="No file chosen" style="-fx-background-color: #E4F7CD; -fx-text-fill: #5C7EEB; -fx-border-color: #457B9D;" />
-                                    </children>
-                                </VBox>
-                                <Label alignment="CENTER" prefHeight="102.0" prefWidth="456.0" text="Drop an Image here" style="-fx-font-style: italic; -fx-text-fill: #457B9D;" />
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
+                <HBox prefHeight="250.0" prefWidth="1000.0" spacing="10.0" style="-fx-padding: 10px;">
+                    <!-- Image Preview -->
+                    <VBox alignment="CENTER" prefWidth="480.0" spacing="10.0">
+                        <StackPane alignment="CENTER">
+                            <ImageView fx:id="preImage" fitHeight="300.0" fitWidth="480.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;" />
+                            <!-- Resizable Crop Box (Black Rectangle) -->
+                            <Rectangle fx:id="cropBox" width="100.0" height="100.0" stroke="black" strokeWidth="2.0" fill="rgba(0, 0, 0, 0.3)" />
+                        </StackPane>
+                    </VBox>
 
-                <!-- Processing Section for Edge Detection and Crop -->
-                <StackPane fx:id="processPane" prefHeight="563.0" prefWidth="1000.0" style="-fx-background-color: #FFFFFF;">
-                    <children>
-                        <!-- Edge Detection Options -->
-                        <VBox fx:id="edgeBox" prefHeight="563.0" prefWidth="1000.0">
-                            <children>
-                                <VBox fx:id="optionPane" prefHeight="158.0" prefWidth="1000.0">
-                                    <children>
-                                        <Label text="Edge Detection Options" style="-fx-background-color: #457B9D; -fx-text-fill: white; -fx-padding: 5 0 5 10; -fx-font-size: 16px;" />
-                                        <HBox fx:id="optionEdge" prefHeight="153.0" prefWidth="1000.0" alignment="CENTER" spacing="10.0">
-                                            <children>
-                                                <ToggleButton fx:id="prewittBtn" text="Prewitt" style="-fx-background-color: #257574; -fx-text-fill: white;" />
-                                                <ToggleButton fx:id="robertBtn" text="Roberts Cross" style="-fx-background-color: #257574; -fx-text-fill: white;" selected="true" />
-                                                <ToggleButton fx:id="sobelBtn" text="Sobel" style="-fx-background-color: #257574; -fx-text-fill: white;" />
-                                            </children>
-                                        </HBox>
+                    <!-- Processed Image Preview -->
+                    <VBox alignment="CENTER" prefWidth="480.0" spacing="10.0">
+                        <!-- Moved Processed Image Label Up -->
+                        <Label text="Processed Image" style="-fx-font-size: 14px; -fx-text-fill: #1D3557; -fx-padding: 0 0 5px 0;" />
+                        <ImageView fx:id="postImage" fitHeight="300.0" fitWidth="480.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;" />
+                    </VBox>
+                </HBox>
 
-                                        <!-- Strength and Kernel Size Parameters -->
-                                        <VBox fx:id="parameter" prefHeight="200.0" prefWidth="1000.0" spacing="10.0">
-                                            <HBox fx:id="strengthParameter" spacing="10.0">
-                                                <Label text="Strength" prefWidth="100.0" />
-                                                <Slider fx:id="strengthSlider" prefWidth="800.0" value="50.0" showTickLabels="true" showTickMarks="true" />
-                                            </HBox>
-                                            <HBox fx:id="kernelEdge" spacing="10.0">
-                                                <ToggleButton fx:id="threeBtn" text="3x3" style="-fx-background-color: #257574; -fx-border-color: white; -fx-text-fill: white;" />
-                                                <ToggleButton fx:id="fiveBtn" text="5x5" style="-fx-background-color: #257574; -fx-border-color: white; -fx-text-fill: white;" />
-                                            </HBox>
-                                        </VBox>
-                                    </children>
-                                </VBox>
-
-                                <!-- Image Previews and Controls -->
-                                <HBox prefHeight="448.0" prefWidth="1000.0" spacing="20.0">
-                                    <VBox alignment="CENTER" prefWidth="500.0" spacing="10.0">
-                                        <ImageView fx:id="preImageE" fitHeight="313.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;" />
-                                        <HBox spacing="10.0">
-                                            <Label text="File name:" />
-                                            <Label fx:id="currentFileNameE" text="No file chosen" />
-                                            <Label fx:id="fileNumberE" text="0/0" />
-                                        </HBox>
-
-                                        <!-- Navigation buttons for .zip files -->
-                                        <HBox spacing="10.0">
-                                            <Button fx:id="prevBtn" mnemonicParsing="false" text="Previous" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" />
-                                            <Button fx:id="nextBtn" mnemonicParsing="false" text="Next" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" />
-                                        </HBox>
-
-                                        <!-- Generate and Progress Bar -->
-                                        <Button fx:id="generateBtnE" text="Generate" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" />
-                                        <ProgressBar fx:id="progressBarE" prefWidth="500.0" progress="0.0" style="-fx-accent: #457B9D;" />
-
-                                        <!-- Save Button after image generation -->
-                                        <Button fx:id="saveBtn" mnemonicParsing="false" text="Save" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" visible="false" />
-                                    </VBox>
-
-                                    <VBox alignment="CENTER" prefWidth="500.0" spacing="10.0">
-                                        <Label text="Processed Image" style="-fx-font-size: 14px; -fx-text-fill: #1D3557;" />
-                                        <ImageView fx:id="postImageE" fitHeight="313.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;" />
-                                    </VBox>
-                                </HBox>
-                            </children>
-                        </VBox>
-
-                        <!-- Crop Options -->
-                        <VBox fx:id="cropBox" prefHeight="563.0" prefWidth="1000.0" visible="false">
-                            <children>
-                                <VBox alignment="CENTER" spacing="20.0">
-                                    <!-- Image Previews -->
-                                    <HBox spacing="20.0">
-                                        <VBox alignment="CENTER">
-                                            <Label text="Original Image" style="-fx-font-size: 14px; -fx-text-fill: #1D3557;" />
-                                            <ImageView fx:id="preImageC" fitHeight="400.0" fitWidth="500.0" preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;" />
-                                        </VBox>
-                                        <VBox alignment="CENTER">
-                                            <Label text="Processed Image" style="-fx-font-size: 14px; -fx-text-fill: #1D3557;" />
-                                            <ImageView fx:id="postImageC" fitHeight="400.0" fitWidth="500.0" preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <!-- Generate and Progress Bar -->
-                                    <Button fx:id="generateBtnC" text="Generate" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" />
-                                    <ProgressBar fx:id="progressBarC" prefWidth="500.0" progress="0.0" style="-fx-accent: #457B9D;" />
-                                </VBox>
-                            </children>
-                        </VBox>
-                    </children>
-                </StackPane>
+                <!-- Navigation Buttons and Progress Bar -->
+                <HBox spacing="10.0" alignment="CENTER" prefHeight="70.0">
+                    <Label text="File name:" />
+                    <Label fx:id="currentFile" text="No file chosen" />
+                    <Label fx:id="fileNumber" text="0/0" />
+                    <Button fx:id="prevBtn" mnemonicParsing="false" text="Previous" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" onAction="#navigatePrevious"/>
+                    <Button fx:id="nextBtn" mnemonicParsing="false" text="Next" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" onAction="#navigateNext"/>
+                    <Button fx:id="generateBtn" text="Generate" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" />
+                    <Button fx:id="saveBtn" text="Save" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" />
+                    <ProgressBar fx:id="progressBar" prefWidth="250.0" progress="0.0" style="-fx-accent: #457B9D;" />
+                </HBox>
             </children>
         </VBox>
     </children>
