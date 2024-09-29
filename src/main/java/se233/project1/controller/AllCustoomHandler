@@ -1,5 +1,260 @@
 package se233.project1.controller;
 
-public class AllCustomHander{
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
 
+import java.io.File;
+
+public class AllCustomHandler {
+    @FXML
+    private Button chooseFileBtn, generateBtn, saveBtn, nextBtn, prevBtn;
+    @FXML
+    private ImageView preImage, postImage;
+    @FXML
+    private ProgressBar progressBar;
+    @FXML
+    private Label currentFile, fileNumber, currentFileName;
+    @FXML
+    private ToggleButton edgeBtn, cropBtn;
+    @FXML
+    private VBox edgeParamsPane;
+    @FXML
+    private Rectangle cropBox;
+
+    private File currentFilePath;
+    private ImageProcessing imageProcessingService;
+    private ZipHandler zipHandler;
+    private String currentMode;
+
+    @FXML
+    public void initialize() {
+        imageProcessingService = new ImageProcessing();
+        zipHandler = new ZipHandler();
+        nextBtn.setDisable(true);
+        prevBtn.setDisable(true);
+        saveBtn.setVisible(false);
+        setMode("crop");
+
+        // Handle file selection
+        chooseFileBtn.setOnAction(event -> chooseFile());
+    }
+//file handler
+    @FXML
+    public void handleDragOver(DragEvent event) {
+        if (event.getGestureSource() != preImage && event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+        }
+        event.consume();
+    }
+
+    @FXML
+    public void handleDrop(DragEvent event) {
+        Dragboard db = event.getDragboard();
+        boolean success = false;
+
+        if (db.hasFiles()) {
+            success = true;
+            File file = db.getFiles().get(0);
+            loadFile(file);
+        }
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    private void loadFile(File file) {
+        String fileType = getFileType(file);
+
+        if ("image".equals(fileType)) {
+            loadImage(file);
+            updateFileNumber(1, 1); // Assuming single image loaded
+        } else if ("zip".equals(fileType)) {
+            loadZipFile(file);
+            updateFileNumber(zipHandler.getImageCount(), zipHandler.getCurrentIndex() + 1); // Update to reflect total images and current index
+            prevBtn.setDisable(false);
+            nextBtn.setDisable(false);
+        } else {
+            showError("Please drop an image file (JPEG, PNG, BMP) or a ZIP file.");
+        }
+    }
+
+    private void loadImage(File file) {
+        try {
+            Image image = new Image(file.toURI().toString());
+            preImage.setImage(image);
+            currentFilePath = file;
+            updateCurrentFileLabel(file);
+        } catch (Exception e) {
+            showError("Failed to load the image. Please try again.");
+        }
+    }
+
+    private void loadZipFile(File file) {
+        try {
+            zipHandler.loadZipFile(file);
+            showImage(zipHandler.getCurrentImage());
+            updateFileNumber(zipHandler.getImageCount(), zipHandler.getCurrentIndex() + 1); // Update current image index
+        } catch (Exception e) {
+            showError("Failed to load the ZIP file. Please ensure it contains valid images.");
+        }
+    }
+
+    private void updateCurrentFileLabel(File file) {
+        currentFile.setText(file.getName());
+        currentFileName.setText(file.getName());
+        fileNumber.setText("1/1");
+    }
+
+    private boolean isImageFile(File file) {
+        String fileName = file.getName().toLowerCase();
+        return fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".bmp");
+    }
+
+    @FXML
+    public void handleChooseFileAction(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Image or ZIP File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.jpeg", "*.png", "*.bmp"),
+                new FileChooser.ExtensionFilter("ZIP Files", "*.zip")
+        );
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            loadFile(file);
+        }
+    }
+
+    private void updateFileNumber(int totalFiles, int currentIndex) {
+        fileNumber.setText(currentIndex + "/" + totalFiles);
+    }
+
+    private void chooseFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.jpg", "*.png", "*.jpeg"),
+                new FileChooser.ExtensionFilter("ZIP files", "*.zip")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(null);
+        if (selectedFile != null) {
+            loadFile(selectedFile);
+        }
+    }
+
+    private void showImage(Image image) {
+        preImage.setImage(image);
+        postImage.setImage(null); // Clear the processed image area until processed
+        saveBtn.setVisible(false); // Hide save button until processing is done
+    }
+
+    @FXML
+    private void generateImage() {
+        Image processedImage = null;
+        if ("edge".equals(currentMode)) {
+            processedImage = imageProcessingService.processEdgeImage(preImage.getImage());
+        } else if ("crop".equals(currentMode)) {
+            processedImage = imageProcessingService.processCropImage(preImage.getImage());
+        }
+
+        postImage.setImage(processedImage);
+        saveBtn.setVisible(true);
+    }
+
+    @FXML
+    private void saveImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Files", "*.png"));
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            imageProcessingService.saveImage(postImage.getImage(), file);
+        }
+    }
+    //button handler
+    @FXML
+    private void handleEdgeButtonAction(ActionEvent event) {
+        if (edgeBtn.isSelected()) {
+            setMode("edge");
+            cropBtn.setSelected(false);
+        }
+    }
+
+    @FXML
+    private void handleCropButtonAction(ActionEvent event) {
+        if (cropBtn.isSelected()) {
+            setMode("crop");
+            edgeBtn.setSelected(false);
+        }
+    }
+
+    private void setMode(String mode) {
+        this.currentMode = mode;
+        refresh();
+
+        if ("edge".equals(mode)) {
+            edgeParamsPane.setVisible(true);
+            cropBox.setVisible(false);
+        } else {
+            edgeParamsPane.setVisible(false);
+            cropBox.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void navigateNext() {
+        if (zipHandler.hasNext()) {
+            showImage(zipHandler.getNextImage());
+            updateNavigationButtons();
+            fileNumber.setText((zipHandler.getCurrentIndex()+1)+"/"+zipHandler.getImageCount());
+
+        }
+    }
+
+    @FXML
+    private void navigatePrevious() {
+        if (zipHandler.hasPrevious()) {
+            showImage(zipHandler.getPreviousImage());
+            updateNavigationButtons();
+            fileNumber.setText((zipHandler.getCurrentIndex()+1)+"/"+zipHandler.getImageCount());
+        }
+    }
+
+    private void updateNavigationButtons() {
+        nextBtn.setDisable(!zipHandler.hasNext());
+        prevBtn.setDisable(!zipHandler.hasPrevious());
+    }
+
+    private void refresh() {
+        preImage.setImage(null);
+        postImage.setImage(null);
+        currentFileName.setText("No file chosen");
+        fileNumber.setText("0/0");
+        progressBar.setProgress(0);
+        saveBtn.setVisible(false);
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    private String getFileType(File file) {
+        if (file.getName().toLowerCase().endsWith(".zip")) {
+            return "zip";
+        } else if (isImageFile(file)) {
+            return "image";
+        } else {
+            return "invalid";
+        }
+    }
 }
