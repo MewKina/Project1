@@ -108,9 +108,23 @@ public class AllCustomHandler {
     }
 
     private void updateCurrentFileLabel(File file) {
-        currentFile.setText(file.getName());
-        currentFileName.setText(file.getName());
-        fileNumber.setText("1/1");
+        if (currentFilePath != null) {
+            // If it's a normal file, display its name
+            currentFileName.setText(currentFilePath.getName());
+        } else if (zipHandler != null && zipHandler.getCurrentFile() != null) {
+            // If it's a ZIP file, display the name of the current image in the zip
+            currentFileName.setText(zipHandler.getCurrentFile());
+        } else {
+            // In case there is no file, set a default message
+            currentFileName.setText("No file selected");
+        }
+
+        // Update the file number based on ZIP or single image
+        if (zipHandler != null && zipHandler.getImageCount() > 0) {
+            fileNumber.setText((zipHandler.getCurrentIndex() + 1) + "/" + zipHandler.getImageCount());
+        } else {
+            fileNumber.setText("1/1");
+        }
     }
 
     private boolean isImageFile(File file) {
@@ -213,8 +227,7 @@ public class AllCustomHandler {
         if (zipHandler.hasNext()) {
             showImage(zipHandler.getNextImage());
             updateNavigationButtons();
-            fileNumber.setText((zipHandler.getCurrentIndex()+1)+"/"+zipHandler.getImageCount());
-
+            updateCurrentFileLabel();
         }
     }
 
@@ -223,7 +236,7 @@ public class AllCustomHandler {
         if (zipHandler.hasPrevious()) {
             showImage(zipHandler.getPreviousImage());
             updateNavigationButtons();
-            fileNumber.setText((zipHandler.getCurrentIndex()+1)+"/"+zipHandler.getImageCount());
+            updateCurrentFileLabel();
         }
     }
 
