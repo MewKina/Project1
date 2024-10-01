@@ -3,11 +3,9 @@ package se233.project1.controller;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -15,20 +13,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class AllCustomHandler {
     @FXML
@@ -40,16 +33,11 @@ public class AllCustomHandler {
     @FXML
     private Label currentFile, fileNumber, currentFileName;
     @FXML
-    private ToggleButton edgeBtn, cropBtn,prewittBtn,robertsCrossBtn,laplacianBtn,matrix3x3,matrix5x5;
+    private ToggleButton edgeBtn, cropBtn,prewittBtn,robertsCrossBtn,laplacianBtn;
     @FXML
     private VBox edgeParamsPane;
     @FXML
     private HBox matrixParamsPane,strengthParamsPane;
-
-    @FXML
-    private Slider strengthSlider;
-    @FXML
-    private TextField strengthInput;
 
     private File currentFilePath;
     private ImageProcessing imageProcessingService;
@@ -61,8 +49,6 @@ public class AllCustomHandler {
     private double initialHeight; // Initial height of the crop box during resize
     private double initialX; // Initial x position during resize
     private double initialY; // Initial y position during resize
-    private int currentImageIndex = 0;
-    private List<Image> imagesList = new ArrayList<>();
     private List<Image> processedImagesList = new ArrayList<>();
     private boolean isGenerate;
 
@@ -76,8 +62,6 @@ public class AllCustomHandler {
         nextBtn.setDisable(true);
         prevBtn.setDisable(true);
         saveBtn.setVisible(false);
-        matrixParamsPane.setVisible(false);
-        strengthParamsPane.setVisible(false);
         cropBox = new Rectangle(100, 100); // Initial size
         cropBox.setFill(Color.TRANSPARENT); // Make it transparent
         cropBox.setStroke(Color.BLACK); // Set border color
@@ -198,7 +182,7 @@ public class AllCustomHandler {
             Image image = new Image(file.toURI().toString());
             preImage.setImage(image);
             currentFilePath = file;
-            updateCurrentFileLabel();
+            updateCurrentFileNameLabel();
         } catch (Exception e) {
             showError("Failed to load the image. Please try again.");
         }
@@ -210,19 +194,22 @@ public class AllCustomHandler {
             showImage(zipHandler.getCurrentImage());
             updateFileNumber(zipHandler.getImageCount(), zipHandler.getCurrentIndex() + 1); // Update current image index
             currentFilePath = file;
+            updateCurrentFileLabel();
         } catch (Exception e) {
             showError("Failed to load the ZIP file. Please ensure it contains valid images.");
         }
     }
 
-    private void updateCurrentFileLabel() {
+    private void updateCurrentFileLabel(){
+        if(zipHandler != null && zipHandler.getCurrentFile() != null){
+            currentFile.setText(zipHandler.getCurrentFile());
+        }
+    }
+    private void updateCurrentFileNameLabel() {
         if (currentFilePath != null) {
             // If it's a normal file, display its name
             currentFileName.setText(currentFilePath.getName());
-        } else if (zipHandler != null && zipHandler.getCurrentFile() != null) {
-            // If it's a ZIP file, display the name of the current image in the zip
-            currentFileName.setText(zipHandler.getCurrentFile());
-        } else {
+        }  else {
             // In case there is no file, set a default message
             currentFileName.setText("No file selected");
         }
@@ -427,16 +414,7 @@ public class AllCustomHandler {
     }
     private void setEdgeMode(String mode) {
         this.currentEdgeMode = mode;
-
-        if("prewitt".equals(mode) || "laplacian".equals(mode)) {
-            matrixParamsPane.setVisible(true);
-            strengthParamsPane.setVisible(false);
-        } else if("roberts".equals(mode)) {
-            strengthParamsPane.setVisible(true);
-           matrixParamsPane.setVisible(false);
-        }
     }
-
     @FXML
     private void navigateNext() throws IndexOutOfBoundsException {
         if (zipHandler.hasNext()) {
@@ -452,6 +430,7 @@ public class AllCustomHandler {
 
             saveBtn.setVisible(isGenerate);
             updateNavigationButtons();
+            updateCurrentFileNameLabel();
             updateCurrentFileLabel();
         }
     }
@@ -471,9 +450,11 @@ public class AllCustomHandler {
 
             saveBtn.setVisible(isGenerate);
             updateNavigationButtons();
+            updateCurrentFileNameLabel();
             updateCurrentFileLabel();
         }
     }
+
 
     private void updateNavigationButtons() {
         nextBtn.setDisable(!zipHandler.hasNext());
