@@ -320,15 +320,22 @@ public class AllCustomHandler {
         return fileName.endsWith(".zip");
     }
     private void processAllImageWithEdgeDetection(){
+        processedImagesList.clear();
+        // Load ZIP file and clear previously processed images
         List<Image> imgInZip = zipHandler.getImagesInZip();
-        try{
-            for(int i=0;i<zipHandler.getImageCount();i++){
-                zipHandler.loadZipFile(currentFilePath);
-                Image image = applyEdgeDetection(imgInZip.get(i),currentEdgeMode);
-                processedImagesList.add(image);
+        try {
+            for (int i = 0; i < zipHandler.getImageCount(); i++) {
+                Image originalImage = imgInZip.get(i);
+                // Apply the edge detection to each image
+                Image processedImage = applyEdgeDetection(originalImage, currentEdgeMode);
+                processedImagesList.add(processedImage);
             }
+            // Set flag to indicate that images have been processed
+            isGenerate = true;
+            // If on the last image after processing, enable the previous button
+            updateNavigationButtons();
         } catch (Exception e) {
-            showError("Failed to load the ZIP file. Please ensure it contains valid images.");
+            showError("Failed to process images in the ZIP file.");
         }
     }
 
@@ -431,10 +438,18 @@ public class AllCustomHandler {
     }
 
     @FXML
-    private void navigateNext() throws IndexOutOfBoundsException{
+    private void navigateNext() throws IndexOutOfBoundsException {
         if (zipHandler.hasNext()) {
-            showImage(zipHandler.getNextImage());
-            postImage.setImage(processedImagesList.get(zipHandler.getCurrentIndex()));
+            // Load the next image from the zip
+            Image nextImage = zipHandler.getNextImage();
+            showImage(nextImage); // Show original image
+            // Get the current index from zipHandler
+            int currentIndex = zipHandler.getCurrentIndex();
+            // If processed images exist, show the processed image at this index
+            if (currentIndex < processedImagesList.size()) {
+                postImage.setImage(processedImagesList.get(currentIndex));
+            }
+
             saveBtn.setVisible(isGenerate);
             updateNavigationButtons();
             updateCurrentFileLabel();
@@ -442,10 +457,18 @@ public class AllCustomHandler {
     }
 
     @FXML
-    private void navigatePrevious() throws IndexOutOfBoundsException{
+    private void navigatePrevious() throws IndexOutOfBoundsException {
         if (zipHandler.hasPrevious()) {
-            showImage(zipHandler.getPreviousImage());
-            postImage.setImage(processedImagesList.get(zipHandler.getCurrentIndex()));
+            // Load the previous image from the zip
+            Image previousImage = zipHandler.getPreviousImage();
+            showImage(previousImage); // Show original image
+            // Get the current index from zipHandler
+            int currentIndex = zipHandler.getCurrentIndex();
+            // If processed images exist, show the processed image at this index
+            if (currentIndex < processedImagesList.size()) {
+                postImage.setImage(processedImagesList.get(currentIndex));
+            }
+
             saveBtn.setVisible(isGenerate);
             updateNavigationButtons();
             updateCurrentFileLabel();
