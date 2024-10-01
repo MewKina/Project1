@@ -39,7 +39,7 @@
             </HBox>
 
 
-
+        <Label layoutY="110.0" prefHeight="100.0" prefWidth="1000.0" text="Crop" style="-fx-font-size: 20px; -fx-text-fill: #1D3557;-fx-background-color: #FFFFFF" alignment="CENTER"/>
         <!-- Edge Detection Options (Slider + Buttons) -->
         <VBox fx:id="edgeParamsPane" layoutY="110.0" prefHeight="100.0" prefWidth="1000.0" spacing="10.0" visible="true" style="-fx-background-color: #FFFFFF; -fx-padding: 10px;">
             <Label text="Edge Detection Options" style="-fx-font-size: 14px; -fx-text-fill: #1D3557;" />
@@ -49,28 +49,16 @@
                 <ToggleButton fx:id="robertsCrossBtn" text="Roberts Cross" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" onAction="#handleRobertsCrossButtonAction"/>
                 <ToggleButton fx:id="laplacianBtn" text="Laplacian" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" onAction="#handleLaplacianButtonAction"/>
             </HBox>
-            <!-- Slider for Edge Detection Strength -->
-            <VBox alignment="CENTER" spacing="10.0">
-                <HBox fx:id="matrixParamsPane" alignment="CENTER" spacing="10.0">
-                    <!-- Matrix Buttons -->
-                    <ToggleButton fx:id="matrix3x3" text="3x3" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" />
-                    <ToggleButton fx:id="matrix5x5" text="5x5" style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;" />
-                </HBox>
-                <HBox fx:id="strengthParamsPane" alignment="CENTER" spacing="10.0">
-                    <Label text="Strength" />
-                    <TextField fx:id="strengthInput" promptText="Enter Strength" />
-                    <Slider fx:id="strengthSlider" prefWidth="700.0" max="100.0" min="0.0" value="50.0" />
-                </HBox>
-            </VBox>
 
         </VBox>
 
         <!-- Main Content Area (Image Preview + Processed Image) -->
-        <VBox layoutY="250.0" prefHeight="500.0" prefWidth="1000.0" spacing="10.0" style="-fx-background-color: #FFFFFF;">
+        <VBox layoutY="200.0" prefHeight="520.0" prefWidth="1000.0" spacing="10.0" style="-fx-background-color: #FFFFFF;">
             <children>
                 <HBox prefHeight="250.0" prefWidth="1000.0" spacing="10.0" style="-fx-padding: 10px;">
                     <!-- Image Preview -->
                     <VBox alignment="CENTER" prefWidth="480.0" spacing="10.0">
+                        <Label text="Original Image" style="-fx-font-size: 14px; -fx-text-fill: #1D3557; -fx-padding: 0 0 5px 0;" />
                         <StackPane fx:id="parentPane" alignment="CENTER">
                             <ImageView fx:id="preImage" fitHeight="300.0" fitWidth="480.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;" />
                         </StackPane>
