@@ -7,12 +7,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 public class Launcher extends Application {
+    public static Stage primaryStage;
     public static void main(String[] args) {
         launch(args);
     }
-public void start(Stage stage) throws Exception{
+    public void start(Stage stage) throws Exception{
         primaryStage = stage;
-        FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("PaneP1.fxml"));
+        URL fxmlUrl = getClass().getResource("PaneP1.fxml");
+        if (fxmlUrl == null) {
+            System.err.println("FXML file not found!");
+            return;
+        }
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PaneP1.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
         primaryStage.setTitle("Picture Manipulator");
